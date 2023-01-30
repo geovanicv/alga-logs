@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.geovani.algaweek.api.service.CatalogoClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,13 @@ import com.geovani.algaweek.domain.repository.ClienteRepository;
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
-		
-	@Autowired
+
+	public ClienteController(CatalogoClienteService catalogoClienteService, ClienteRepository clienteRepository) {
+		this.catalogoClienteService = catalogoClienteService;
+		this.clienteRepository = clienteRepository;
+	}
+
+	private CatalogoClienteService catalogoClienteService;
 	private ClienteRepository clienteRepository;
 	
 	@GetMapping("/teste")
@@ -52,7 +58,7 @@ public class ClienteController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cliente create(@Valid @RequestBody Cliente cliente) {
-		return clienteRepository.save(cliente);
+		return catalogoClienteService.salvar(cliente);
 	}
 	
 
@@ -64,7 +70,7 @@ public class ClienteController {
 		}
 		
 		cliente.setId(clienteId);
-		cliente = clienteRepository.save(cliente); 
+		cliente = catalogoClienteService.salvar(cliente);
 		
 		return ResponseEntity.ok(cliente);
 	}
@@ -75,7 +81,7 @@ public class ClienteController {
 			return ResponseEntity.notFound().build();
 		}
 		
-		clienteRepository.deleteById(clienteId);
+		catalogoClienteService.excluir(clienteId);
 		
 		return ResponseEntity.noContent().build();
 	}
